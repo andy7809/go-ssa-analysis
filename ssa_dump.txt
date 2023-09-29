@@ -1,0 +1,26 @@
+jump 3
+0:
+	[*ssa.Jump           ] jump 3
+1:
+	[*ssa.Index          ] t0 = s[t4]
+	[*ssa.BinOp          ] t1 = t0 & 1:byte
+	[*ssa.BinOp          ] t2 = t1 == 1:byte
+	[*ssa.If             ] if t2 goto 4 else 5
+2:
+	[*ssa.Return         ] return t3
+3:
+	[*ssa.Phi            ] t3 = phi [0: 0:int, 4: t7, 5: t3] #result
+	[*ssa.Phi            ] t4 = phi [0: 0:int, 4: t8, 5: t9] #i
+	[*ssa.Call           ] t5 = len(s)
+	[*ssa.BinOp          ] t6 = t4 < t5
+	[*ssa.If             ] if t6 goto 1 else 2
+4:
+	[*ssa.BinOp          ] t7 = t3 + 1:int
+	[*ssa.BinOp          ] t8 = t4 + 1:int
+	[*ssa.Jump           ] jump 3
+5:
+	[*ssa.BinOp          ] t9 = t4 + 1:int
+	[*ssa.Jump           ] jump 3
+0:
+	[*ssa.Call           ] t0 = countFor2("a":string)
+	[*ssa.Return         ] return

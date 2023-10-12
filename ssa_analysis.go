@@ -19,24 +19,30 @@ var EmbedAnalysis = &analysis.Analyzer{
 var SSAAnalysis = buildssa.Analyzer
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	fmt.Println(pass)
-	fmt.Println("hello world")
-
-	fmt.Println(len(pass.ResultOf))
-	for key, value := range pass.ResultOf {
-		fmt.Printf("%s: %d\n", key, value)
-	}
+	// for key, value := range pass.ResultOf {
+	// 	fmt.Printf("%s: %d\n", key, value)
+	// }
 
 	ssaProg := pass.ResultOf[SSAAnalysis].(*buildssa.SSA)
-	fmt.Println(ssaProg.SrcFuncs[0].Blocks[0].Instrs[0].String())
 	for _, fn := range ssaProg.SrcFuncs {
 		for _, b := range fn.Blocks {
-			fmt.Printf("%s:\n", b.String())
 			for _, i := range b.Instrs {
-				if v, ok := i.(ssa.Value); ok {
-					fmt.Printf("\t[%-20T] %s = %s\n", i, v.Name(), i)
-				} else {
-					fmt.Printf("\t[%-20T] %s\n", i, i)
+				if p, ok := i.(*ssa.Phi); ok {
+					// fmt.Printf("[%-20T] %s = %s\n", i, p.Name(), i)
+					values := make(map[string]bool)
+					for _, op := range p.Edges {
+						// fmt.Printf("%+v\n", op)
+						if binop, ok := op.(*ssa.BinOp); ok {
+							if values[binop.String()] {
+								fmt.Printf("phi type: [%-15T]\n", binop)
+								fmt.Printf("X: %s\n", binop.X.Name())
+								fmt.Printf("Y: %s\n", binop.Y.Name())
+							}
+							values[op.String()] = true
+
+						}
+						// fmt.Printf("%v\n", values)
+					}
 				}
 			}
 		}
